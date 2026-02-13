@@ -4,11 +4,22 @@
 
 ---
 
+## 平台支持
+
+| 平台 | AI 授权 |
+|------|---------|
+| **Cursor** | Cursor Agent（需 Cursor Pro） |
+| **OpenClaw** | OpenClaw 模型（按 OpenClaw 配置） |
+
+**无需单独配置 API**，后处理与摘要由各自平台的 Agent 完成。
+
+---
+
 ## 📦 Zip 安装（推荐）
 
 如你通过 zip 包获得本 skill，请直接阅读 **[安装说明.md](安装说明.md)**。
 
-在 Cursor 中打开本文件夹后，对 Agent 说：
+在 Cursor 或 OpenClaw 中打开本文件夹后，对 Agent 说：
 
 > **帮我安装这个 B 站转文本 skill，按照「安装说明.md」里的 Agent 安装步骤执行**
 
@@ -25,105 +36,51 @@ Agent 会自动完成解压、移动、依赖安装和环境检查，你无需�
 
 ---
 
-## 🚀 快速开始（教学版）
+## 🚀 快速开始
 
-**适用对象：** Cursor 新手、零基础学生
-
-### 三步上手
-
-#### 1️⃣ 克隆项目
+### Cursor 用户
 
 ```bash
-git clone https://github.com/<your-username>/bilibili-video-to-text.git ~/.cursor/skills/bilibili-video-to-text
+git clone https://github.com/AAAAAAlone/skills.git ~/.cursor/skills/bilibili-video-to-text
 cd ~/.cursor/skills/bilibili-video-to-text
-```
-
-如果提示找不到 `git` 命令，在 Cursor 中对 Agent 说：「帮我安装 Git」
-
-#### 2️⃣ 一键安装
-
-**Mac/Linux:**
-```bash
 ./setup.sh
 ```
 
-**Windows (PowerShell 管理员模式):**
-```powershell
-.\setup.ps1
+安装完成后重启终端，对 Agent 说：「帮我把这个 B 站视频转成文字并生成摘要：<视频链接>」
+
+### OpenClaw 用户
+
+```bash
+git clone https://github.com/AAAAAAlone/skills.git ~/.openclaw/skills/bilibili-video-to-text
+cd ~/.openclaw/skills/bilibili-video-to-text
+./setup.sh
 ```
 
-脚本会自动安装所有依赖（Python、ffmpeg、yt-dlp 等），等待 2-5 分钟。
+安装完成后，对 OpenClaw Agent 说：「帮我把这个 B 站视频转成文字并生成摘要：<视频链接>」
 
-安装完成后**重启终端**。
+### Windows
 
-#### 3️⃣ 开始使用
-
-打开 Cursor（需要 Pro 会员），对 Agent 说：
-
-```
-帮我把这个 B 站视频转成文字并生成摘要：https://www.bilibili.com/video/BV1TFcYzxEfK
-```
-
-🎉 几分钟后，你会得到一个带摘要的 Markdown 笔记！
-
-### 视频教程
-
-[待补充：录制演示视频]
+在 PowerShell 中运行 `.\setup.ps1`，路径对应改为 `%USERPROFILE%\.cursor\skills\bilibili-video-to-text` 或 `%USERPROFILE%\.openclaw\skills\bilibili-video-to-text`。
 
 ### 常见问题速查
 
 - **"没有字幕"** → 安装 Whisper: `pip install openai-whisper`
 - **"找不到命令"** → 重启终端刷新环境变量
-- **"Agent 不响应"** → 确保 Cursor Pro 会员有效
+- **"Agent 不响应"** → Cursor 确认 Pro 会员有效；OpenClaw 确认模型已授权
 
-更多问题见 [TEACHING.md](TEACHING.md)（教师指南）
+更多问题见 [TEACHING.md](TEACHING.md)（教师指南）、[reference.md](reference.md)（故障排查）
 
 ---
 
-## 📦 完整安装（进阶用户）
-
-### 1. Clone 到 Cursor Skills
-
-```bash
-git clone https://github.com/<your-username>/bilibili-video-to-text.git ~/.cursor/skills/bilibili-video-to-text
-```
-
-### 2. 安装依赖
-
-**Mac：**
-
-```bash
-brew install python ffmpeg
-cd ~/.cursor/skills/bilibili-video-to-text
-pip install -r requirements.txt
-```
-
-**Windows：**
-
-```powershell
-winget install Python.Python.3.12
-choco install ffmpeg
-cd %USERPROFILE%\.cursor\skills\bilibili-video-to-text
-pip install -r requirements.txt
-```
-
-### 3. 环境检测
-
-```bash
-python scripts/check_env.py
-```
-
-若输出中 `ready_for_subtitle` 为 `true`，即可使用。
-
 ## 使用
 
-### 在 Cursor 中
+### 在 Cursor / OpenClaw 中
 
 对 Agent 说：
 
 > 帮我把这个 B 站视频转成文字并生成摘要：https://www.bilibili.com/video/BV1NfFdznE7s
 
-Agent 会按本 skill 的流程执行，并生成带摘要的 MD 文件。
+Agent 会按本 skill 的流程执行，并生成带摘要的 MD 文件。后处理与摘要由平台 Agent 完成，无需额外 API。
 
 ### 命令行
 

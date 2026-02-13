@@ -5,6 +5,17 @@ description: 从 B 站视频链接获取完整转录文本和摘要，输出为�
 
 # B 站视频转文本
 
+## 平台与授权（默认方式）
+
+本 skill 支持两种平台，**AI 能力均由各自平台提供，无需单独配置 API**：
+
+| 平台 | AI 授权方式 |
+|------|-------------|
+| **Cursor** | 使用 Cursor Agent（需 Cursor Pro） |
+| **OpenClaw** | 使用 OpenClaw 的模型授权（API Key / OAuth 等，按 OpenClaw 配置） |
+
+后处理、摘要生成均由**当前平台的 Agent** 完成，用户只需在对应平台完成授权即可。
+
 ## 触发条件
 
 - 用户提供 B 站视频链接并要求转文字、转文本、提取内容、生成摘要、制作知识库笔记
@@ -33,7 +44,7 @@ cd <skill 目录> && python scripts/check_env.py
 
 1. **提取链接**：从用户消息中识别 B 站视频 URL
 2. **环境检查**：运行 `check_env.py`，若 `ready_for_subtitle` 为 false，按 `install_commands` 指导安装
-3. **执行转写**：
+3. **执行转写**（**不传** `--post-process`，后处理由平台 Agent 完成）：
 
 ```bash
 python scripts/bvt.py "https://www.bilibili.com/video/BVxxxxx" --output-dir <输出目录>
@@ -41,24 +52,7 @@ python scripts/bvt.py "https://www.bilibili.com/video/BVxxxxx" --output-dir <输
 
 若 B 站视频有 CC 字幕但需登录，可加 `--cookies-from-browser chrome` 或 `safari`。
 
-**结构化输出（两种方式）**：
-
-| 方式 | 说明 |
-|------|------|
-| **Cursor Agent**（推荐，无需 API） | 转写完成后，将输出文件交给 Agent，说：「帮我对原文做后处理：添加标点、修正错别字、去除语气词、按逻辑分段」 |
-| **Gemini API** | 加 `--post-process`，需设置 `GEMINI_API_KEY`（在 https://aix.google.dev 获取） |
-
-```bash
-# 方式 1：仅转写，后处理交给 Agent
-python scripts/bvt.py "https://www.bilibili.com/video/BVxxxxx" -o output --cookies-from-browser chrome
-# 然后对 Agent 说：帮我对 output/xxx.md 的原文做后处理
-
-# 方式 2：脚本内自动后处理（需 API Key）
-export GEMINI_API_KEY="你的API密钥"
-python scripts/bvt.py "https://www.bilibili.com/video/BVxxxxx" -o output --post-process
-```
-
-4. **生成摘要**：脚本会输出带 YAML frontmatter 的 MD 文件，其中 `summary` 初值为占位符。Agent 读取原文后，生成 2–4 句摘要，替换 `summary:` 下的内容
+4. **生成摘要**：脚本会输出带 YAML frontmatter 的 MD 文件，其中 `summary` 初值为占位符。**平台 Agent** 读取原文后，生成 2–4 句摘要，替换 `summary:` 下的内容
 5. **可选 tags**：根据视频标题和内容，在 YAML 中补充 `tags` 数组
 6. **删除原始视频**：转写完成后，若 output 目录或工作目录中存在下载的视频/音频文件（`.mp4`、`.webm`、`.mp3`、`.m4a`），删除以释放空间
 
@@ -115,60 +109,48 @@ summary: |
 
 ## 学生使用指南（零基础）
 
-### 第一步：安装 Cursor
+### Cursor 用户
 
-从 https://cursor.sh 下载并安装 Cursor（需要 Pro 会员）
+1. **安装 Cursor**：从 https://cursor.sh 下载并安装（需要 Pro 会员）
+2. **安装 skill**：按 [安装说明.md](安装说明.md) 执行，或对 Agent 说「帮我安装这个 B 站转文本 skill」
+3. **使用**：对 Agent 说「帮我把这个 B 站视频转成文字并生成摘要：<视频链接>」
 
-### 第二步：克隆本 Skill
+### OpenClaw 用户
 
-打开 Cursor 的终端（Terminal），执行以下命令：
+1. **安装 OpenClaw**：按 OpenClaw 官方文档完成安装与模型授权
+2. **安装 skill**：`clawdhub install bilibili-video-to-text` 或复制到 `~/.openclaw/skills/bilibili-video-to-text`
+3. **使用**：对 OpenClaw Agent 说「帮我把这个 B 站视频转成文字并生成摘要：<视频链接>」
+
+AI 后处理与摘要由 OpenClaw 的模型完成，无需额外配置 API。
+
+### 通用安装（Mac/Linux）
 
 ```bash
-git clone https://github.com/<your-username>/bilibili-video-to-text.git ~/.cursor/skills/bilibili-video-to-text
+# Cursor：克隆到 Cursor skills 目录
+git clone https://github.com/AAAAAAlone/skills.git ~/.cursor/skills/bilibili-video-to-text
 cd ~/.cursor/skills/bilibili-video-to-text
-```
 
-如果你的电脑还没有安装 Git，在 Cursor 中对 Agent 说：「帮我安装 Git」
+# OpenClaw：克隆到 OpenClaw skills 目录
+# git clone https://github.com/AAAAAAlone/skills.git ~/.openclaw/skills/bilibili-video-to-text
+# cd ~/.openclaw/skills/bilibili-video-to-text
 
-### 第三步：运行安装脚本
-
-**Mac/Linux 用户：**
-
-```bash
+# 运行安装脚本
 ./setup.sh
 ```
 
-**Windows 用户：**
+**Windows**：在 PowerShell 中运行 `.\setup.ps1`
 
-在 PowerShell 中（可能需要管理员权限）：
+安装完成后**重启终端**。
 
-```powershell
-.\setup.ps1
-```
-
-脚本会自动：
-- 检测并安装缺失的依赖（Python、ffmpeg、yt-dlp）
-- 安装 Python 库
-- 运行环境检测
-- 可选择将 skill 复制到 Cursor skills 目录
-
-安装完成后，**重启终端**以刷新环境变量。
-
-### 第四步：在 Cursor 中使用
-
-在 Cursor 中打开任意项目，对 Agent 说：
-
-```
-帮我把这个 B 站视频转成文字并生成摘要：https://www.bilibili.com/video/BV1TFcYzxEfK
-```
+### 流程说明（Cursor / OpenClaw 通用）
 
 Agent 会自动：
 1. 检测环境是否就绪
-2. 运行 `bvt.py` 脚本获取视频文本
+2. 运行 `bvt.py` 脚本获取视频文本（不传 `--post-process`）
 3. 读取输出文件
 4. **对原文做后处理**：添加标点、修正错别字、去除语气词、逻辑分段（见「Agent 后处理」）
 5. 生成 2-4 句摘要并更新 `summary`
-6. **删除原始视频**：转写完成后，若 output 目录或工作目录中存在下载的视频/音频文件（如 `.mp4`、`.webm`、`.mp3`、`.m4a`），删除以释放空间
+6. **删除原始视频**：转写完成后删除临时视频/音频文件
 7. 告诉你输出文件的位置
 
 ### 常见问题
@@ -187,9 +169,9 @@ A: 首次使用会下载模型（约 150MB），之后会快一些。长视频�
 
 A: 默认在当前目录的 `output/` 文件夹，文件名为视频标题。
 
-**Q: 后处理需要 API Key 吗？**
+**Q: 需要单独配置 API Key 吗？**
 
-A: 不需要。使用 Cursor Agent 后处理时，由 Agent 直接对文本进行转换，无需配置 Gemini 等外部 API。
+A: 不需要。Cursor 使用 Cursor Agent；OpenClaw 使用 OpenClaw 的模型授权。AI 能力由各自平台提供。
 
 ## 故障排查
 
