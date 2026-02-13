@@ -59,6 +59,19 @@ python scripts/bvt.py "https://www.bilibili.com/video/BVxxxxx" --output-dir <输
 6. **可选 tags**：根据视频标题和内容，在 YAML 中补充 `tags` 数组
 7. **删除原始视频**：转写完成后，若 output 目录或工作目录中存在下载的视频/音频文件（`.mp4`、`.webm`、`.mp3`、`.m4a`），删除以释放空间
 
+## ⚠️ 后处理执行方式（重要）
+
+后处理**必须由 Agent 自己完成**，即：
+- Agent 读取 `# 完整原文` 下的文本
+- 使用当前平台的 LLM 能力（Cursor Agent / OpenClaw 模型）对文本进行转换
+- 将转换后的文本写回文件
+
+**禁止**：
+- 使用 `bvt.py --post-process`（该选项依赖 GEMINI_API_KEY，本 skill 不使用）
+- 调用 postprocess.py 或任何需要外部 API 的脚本
+
+无论是否配置 GEMINI_API_KEY，Agent 都应完成后处理。
+
 ## Agent 后处理（固化能力）
 
 当用户要求对转写原文做后处理，或原文为无标点、口语化、有错别字的连续文本时，Agent **必须**执行以下步骤：
