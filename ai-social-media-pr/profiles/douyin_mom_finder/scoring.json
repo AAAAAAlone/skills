@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "skill_name": "douyin-mom-finder",
+  "scoring_system": {
+    "total_scale": 10,
+    "qualifies_threshold": 6,
+    "very_recommended_threshold": 9,
+    "rules": [
+      { "item": "置顶前三位包含真实带娃视频", "score": 3.0, "type": "bonus", "id": "pinned_top3_real_baby" },
+      { "item": "24宫格中超过5个格子出现婴幼儿元素", "score": 2.5, "type": "visual", "id": "grid_infant_count_5" },
+      { "item": "封面包含奶粉、纸尿裤、教辅等实物", "score": 2.0, "type": "visual", "id": "maternal_products" },
+      { "item": "背景为真实居家/生活化场景", "score": 1.5, "type": "vibe", "id": "real_home_scene" },
+      { "item": "未使用AI军装/AI创作等活跃女性滤镜", "score": 1.0, "type": "vibe", "id": "no_ai_army" },
+      { "item": "名字/简介包含'妈/麻/育儿/记录成长'", "score": 2.0, "type": "text_bonus", "id": "bio_keywords" }
+    ]
+  },
+  "grid_scope": 24,
+  "refinements": {
+    "child_age_0_3_only": "仅将 0-3 岁小宝宝计为婴幼儿元素；大孩子不计入且可扣分",
+    "clutter_penalty": "封面杂乱/广告感强时降调性，不视为真实宝妈"
+  },
+  "logic": {
+    "step1_grid_analysis": "Evaluate 24-note grid against visual_cues. Count matching covers (infant 0-3, real home, no AI). Target: >5 strong matches for perfect.",
+    "step2_bio_analysis": "Extract Name + Bio. Verify keywords match real mom profile."
+  }
+}

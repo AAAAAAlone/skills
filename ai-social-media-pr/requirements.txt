@@ -1,0 +1,11 @@
+# AI Social Media PR
+Pillow>=10.0.0
+pytesseract>=0.3.10
+openai>=1.0.0
+playwright>=1.40.0
+# 可选：其他 Vision API
+# anthropic>=0.18.0
+# google-generativeai>=0.3.0
+# 可选：封面向量相似度
+# sentence-transformers>=2.2.0
+# numpy>=1.24.0
